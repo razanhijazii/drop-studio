@@ -1,0 +1,9 @@
+fastapi==0.161.1
+starlette==1.7.0
+pydantic==2.13.5
+uvicorn[standard]==0.54.0
+SQLAlchemy==2.0.43
+alembic==1.16.5
+httpx==0.28.1
+python-multipart==0.0.32
+psycopg[binary]>=3.2,<4
