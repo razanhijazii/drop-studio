@@ -3,7 +3,7 @@
     python -m app.seed            brand concepts, DNA rules and this season's trend signals
     python -m app.seed --demo     also a sample launched drop with sales, clearly named as a demo
 
-Safe to run twice: it skips anything that already exists.
+Safe to run any number of times: starter data is only added to an empty database.
 """
 
 from __future__ import annotations
@@ -39,16 +39,16 @@ DNA = [
 ]
 
 def seed(demo: bool = False) -> None:
+    """Fill a brand-new database. Runs on every start, but only acts once: when the brand
+    profile doesn't exist yet. After that, rules or signals you delete stay deleted."""
     with SessionLocal() as db:
-        p = get_profile(db)
-        if not p.concepts:
+        if db.get(m.BrandProfile, 1) is None:
+            p = get_profile(db)
             p.one_liner = "Premium everyday basics with a community feel: upscale, never Gucci-level luxury."
             p.concepts = "Pursuing your dreams. Unplugging from technology and toxic surroundings."
             p.price_position = "Above high street, well below luxury"
             p.never_do = "Trying too hard. Loud logos."
-        if not db.scalar(select(m.DnaRule.id).limit(1)):
             db.add_all(m.DnaRule(text=t, source="founder's concept") for t in DNA)
-        if not db.scalar(select(m.TrendSignal.id).limit(1)):
             db.add_all(m.TrendSignal(title=t, source=s, note=n, url=u) for t, s, n, u in SIGNALS)
         if demo and not db.scalar(select(m.Drop.id).where(m.Drop.name.like("DEMO%"))):
             _demo(db)

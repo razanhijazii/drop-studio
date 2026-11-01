@@ -77,7 +77,7 @@ Tests: `cd backend && pytest` · Types: `cd frontend && npm run typecheck`
    - `ANTHROPIC_API_KEY`: from [console.anthropic.com](https://console.anthropic.com)
    - `FRONTEND_ORIGIN`: the web service URL, e.g. `https://drop-studio-web.onrender.com`
    - `API_URL` (on drop-studio-web): the API URL, e.g. `https://drop-studio-api.onrender.com`
-3. After the first deploy, open the API service's **Shell** and run `python -m app.seed` to load the starter brand concepts and trend signals.
+3. On its first start the API loads the starter brand concepts and trend signals by itself (only into an empty database).
 
 The free API service sleeps after 15 minutes idle; the first request after that takes about a minute while it wakes up.
 
