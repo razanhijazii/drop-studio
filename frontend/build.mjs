@@ -4,7 +4,11 @@ import * as esbuild from "esbuild";
 import { cpSync, mkdirSync, rmSync } from "node:fs";
 
 const serve = process.argv.includes("--serve");
-const apiUrl = (process.env.API_URL || "http://localhost:8000").replace(/\/$/, "");
+const apiUrl = (process.env.API_URL || "http://localhost:8000").trim().replace(/\/$/, "");
+if (!/^https?:\/\/[^/\s]+/.test(apiUrl)) {
+  console.error(`API_URL must be the backend's web address, e.g. https://drop-studio-api.onrender.com (got "${apiUrl}").`);
+  process.exit(1);
+}
 
 rmSync("dist", { recursive: true, force: true });
 mkdirSync("dist", { recursive: true });
