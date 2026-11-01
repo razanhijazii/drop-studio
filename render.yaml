@@ -25,7 +25,7 @@ services:
       - key: ANTHROPIC_MODEL
         value: claude-sonnet-5-5
       - key: FRONTEND_ORIGIN
-        sync: false # e.g. https://drop-studio-web.onrender.com
+        value: https://drop-studio-web.onrender.com
 
   - type: web
     name: drop-studio-web
@@ -35,4 +35,4 @@ services:
     staticPublishPath: dist
     envVars:
       - key: API_URL
-        sync: false # e.g. https://drop-studio-api.onrender.com
+        value: https://drop-studio-api.onrender.com
