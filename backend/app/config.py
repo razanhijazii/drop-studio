@@ -13,6 +13,14 @@ from functools import lru_cache
 
 
 def _normalise_db_url(url: str) -> str:
+    # Tolerate what gets copied from a provider's "Connect" box: surrounding spaces or
+    # quotes, a `psql '...'` command, or a `.env` line like `DATABASE_URL=...`.
+    url = url.strip()
+    if url.startswith("psql "):
+        url = url[5:].strip()
+    if url.upper().startswith("DATABASE_URL="):
+        url = url.split("=", 1)[1].strip()
+    url = url.strip("'\"").strip()
     # Render and Neon hand out postgres:// URLs; SQLAlchemy wants an explicit driver.
     if url.startswith("postgres://"):
         url = "postgresql://" + url[len("postgres://"):]
@@ -59,6 +67,13 @@ class Settings:
             ]
             if missing:
                 raise RuntimeError(f"Missing required settings in production: {', '.join(missing)}")
+            if not self.database_url.startswith("postgresql+psycopg://"):
+                # Never echo the value: it contains the database password.
+                start = self.database_url[:12] or "(empty)"
+                raise RuntimeError(
+                    "DATABASE_URL must be a Postgres connection string starting with postgresql:// "
+                    f"(it currently starts with {start!r}). Copy the full string from Neon > Connect."
+                )
 
 
 @lru_cache

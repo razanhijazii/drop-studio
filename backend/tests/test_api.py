@@ -218,3 +218,27 @@ def test_production_requires_password():
 
     with pytest.raises(RuntimeError):
         Settings(env="production").validate()
+
+
+def test_database_url_cleanup():
+    from app.config import _normalise_db_url as n
+
+    want = "postgresql+psycopg://u:p@host/db?sslmode=require"
+    for raw in (
+        "postgresql://u:p@host/db?sslmode=require",
+        "postgres://u:p@host/db?sslmode=require",
+        "  'postgresql://u:p@host/db?sslmode=require'\n",
+        "psql 'postgresql://u:p@host/db?sslmode=require'",
+        'DATABASE_URL="postgresql://u:p@host/db?sslmode=require"',
+    ):
+        assert n(raw) == want, raw
+
+
+def test_production_rejects_bad_database_url():
+    import pytest
+
+    s = Settings(env="production", app_password="x", secret_key="k" * 32, database_url="x")
+    with pytest.raises(RuntimeError, match="DATABASE_URL"):
+        s.validate()
+    Settings(env="production", app_password="x", secret_key="k" * 32,
+             database_url="postgresql+psycopg://u:p@h/db").validate()
